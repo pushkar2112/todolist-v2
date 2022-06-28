@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017//todolistDB"); //Connect to mongodb using mongoose
+mongoose.connect("mongodb://localhost:27017/todolistDB"); //Connect to mongodb using mongoose
 
 const itemsSchema = {
   name: String
@@ -37,7 +37,7 @@ Item.insertMany(defaultItems, function(err){
   if (err){
     console.log(err);
   } else {
-    console.log("Inserted Successfully!");
+    console.log("Inserted Default Items Successfully!");
   }
 });
 
