@@ -65,25 +65,51 @@ app.get("/", function(req, res) {
 app.get("/:customListName", function(req, res){
   const customListName = req.params.customListName;
 
-  const list = new List({
-    name: customListName,
-    items: defaultItems
-  });
+  List.findOne({name: customListName}, function(err, foundList){
+    if (!err){
+      if (!foundList){
+        const list = new List({
+          // Create a new list
+          name: customListName,
+          items: defaultItems
+        });
 
-  list.save();
-  
+        list.save();
+
+        res.redirect("/" + customListName)
+
+      } else {
+        // Show an existing list
+        res.render("list", {listTitle: foundList.name, newListItems: foundList.items});
+      }
+    }
+  })
+
+
 })
 
 app.post("/", function(req, res){
 
   const itemName = req.body.newItem;
+  const listName = req.body.list;
+
   const item  = new Item({
     name: itemName
   });
 
-  item.save();
+  if (listName === 'Today'){
+    item.save();
 
-  res.redirect("/")
+    res.redirect("/")
+  } else {
+    List.findOne({name: listName}, function(err, foundList){
+      foundList.items.push(item)
+      foundList.save();
+      res.redirect("/" + listName);
+    })
+  }
+
+
 
   // if (req.body.list === "Work") {
   //   workItems.push(item);
@@ -95,17 +121,28 @@ app.post("/", function(req, res){
 });
 
 app.post("/delete", function(req,res){
-  const checkedItem = req.body.checkbox;
+  const checkedItemId = req.body.checkbox;
+  const listName = req.body.listName;
 
-  Item.findByIdAndRemove(checkedItem, function(err){
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Checked Item deleted successfully!");
-    }
-  })
+  if (listName === 'Today'){
+    Item.findByIdAndRemove(checkedItemId, function(err){
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Checked Item deleted successfully!");
+      }
+    })
+  
+    res.redirect("/")
+  } else {
+    List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
+      if (!err){
+        res.redirect("/" + listName)
+      }
+    })
+  }
 
-  res.redirect("/")
+  
 
 })
 
