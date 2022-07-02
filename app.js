@@ -12,10 +12,10 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/todolistDB"); //Connect to mongodb using mongoose
+mongoose.connect("mongodb+srv://admin-pushkar:Test123@cluster0.pydqxax.mongodb.net/todolistDB?retryWrites=true&w=majority"); //Connect to mongodb using mongoose
 
 const itemsSchema = {
-  name: String
+  name: { type: String}
 };
 
 const Item = mongoose.model("Item",itemsSchema);
@@ -58,6 +58,7 @@ app.get("/", function(req, res) {
 
     } else {
       res.render("list", {listTitle: "Today", newListItems: foundItems});
+      // res.redirect("/")
     } 
   });
 
