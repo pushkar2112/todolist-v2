@@ -4,8 +4,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const https = require("http");
 
 const app = express();
+
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs');
 
@@ -62,6 +65,23 @@ app.get("/", function(req, res) {
     } 
   });
 
+});
+
+
+app.get("/test", function(req,res){
+  
+  const url = "http://localhost:8000/test"
+  https.get(url,function(response){
+    console.log(response.statusCode);
+
+    response.on("data",function(data){
+      const testData = JSON.parse(data);
+      console.log(testData);
+      var msg = testData.data
+     res.send("Message is: " + msg);
+    })
+  })
+  
 });
 
 app.get("/:customListName", function(req, res){
